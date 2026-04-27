@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>👑 관리자 패널 - 힐링 펫 팜</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .admin-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .admin-header {
+      background: white;
+      border-radius: 16px;
+      padding: 20px 30px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+
+    .admin-header h1 {
+      font-size: 28px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .admin-nav {
+      display: flex;
+      gap: 10px;
+    }
+
+    .admin-nav a {
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .admin-nav a:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .admin-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 20px;
+    }
+
+    .admin-card {
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+
+    .admin-card-header {
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+      padding: 15px 20px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .admin-card-header h3 {
+      font-size: 18px;
+      color: #333;
+    }
+
+    .admin-card-body {
+      padding: 20px;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+
+    .stat-item {
+      background: linear-gradient(135deg, #f8f9fa 0%, #fff 100%);
+      padding: 15px;
+      border-radius: 12px;
+      text-align: center;
+      border: 1px solid #eee;
+    }
+
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: #667eea;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: #666;
+      margin-top: 5px;
+    }
+
+    .setting-group {
+      margin-bottom: 20px;
+    }
+
+    .setting-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #333;
+    }
+
+    .setting-group input,
+    .setting-group select {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #eee;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.2s;
+    }
+
+    .setting-group input:focus,
+    .setting-group select:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+    }
+
+    .pet-list {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .pet-item {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      background: #f8f9fa;
+      transition: all 0.2s;
+    }
+
+    .pet-item:hover {
+      background: #e9ecef;
+    }
+
+    .pet-emoji {
+      font-size: 36px;
+    }
+
+    .pet-info {
+      flex: 1;
+    }
+
+    .pet-name {
+      font-weight: 600;
+      color: #333;
+    }
+
+    .pet-stats {
+      font-size: 12px;
+      color: #666;
+    }
+
+    .pet-actions {
+      display: flex;
+      gap: 5px;
+    }
+
+    .pet-actions button {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .status-connected {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .status-disconnected {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .evolution-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 15px;
+    }
+
+    .evolution-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      background: #f8f9fa;
+      border-radius: 10px;
+    }
+
+    .evolution-stage {
+      text-align: center;
+    }
+
+    .evolution-emoji {
+      font-size: 28px;
+    }
+
+    .evolution-level {
+      font-size: 10px;
+      color: #666;
+    }
+
+    .evolution-arrow {
+      color: #667eea;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-container">
+    <header class="admin-header">
+      <h1>👑 스트리머 관리자 패널</h1>
+      <nav class="admin-nav">
+        <a href="/">🏠 메인</a>
+        <a href="/test">🎮 테스트</a>
+      </nav>
+    </header>
+
+    <div class="admin-content">
+      <!-- YouTube 라이브 연결 -->
+      <div class="admin-card">
+        <div class="admin-card-header">
+          <h3>📺 YouTube 라이브 연결</h3>
+        </div>
+        <div class="admin-card-body">
+          <div id="youtubeStatus" style="margin-bottom: 15px;">
+            <span class="status-badge status-disconnected">연결 안됨</span>
+          </div>
+          <div class="setting-group">
+            <label>YouTube 영상 ID</label>
+            <input type="text" id="videoId" placeholder="예: zWpwMGES1Lg">
+            <small style="color: #666;">URL에서 ?v= 뒤의 값</small>
+          </div>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button class="btn btn-primary" onclick="connectYouTubeFree()" style="flex: 1; background: linear-gradient(135deg, #4CAF50, #2E7D32);" title="API 할당량 없이 무료로 연결">🆓 무료 연결 (추천)</button>
+            <button class="btn btn-danger" onclick="disconnectYouTube()">⏹️ 중지</button>
+          </div>
+          <p style="font-size: 11px; color: #666; margin-top: 10px; text-align: center;">
+            무료 연결: API 할당량 제한 없음! 바로 사용 가능
+          </p>
+          <hr style="margin: 15px 0; border: none; border-top: 1px solid #eee;">
+          <details style="margin-top: 10px;">
+            <summary style="cursor: pointer; color: #666; font-size: 13px;">🔧 기존 API 연결 (할당량 제한 있음)</summary>
+            <div style="margin-top: 10px;">
+              <button class="btn btn-primary" onclick="connectYouTube()" style="width: 100%; margin-bottom: 10px;">▶️ API 라이브 연결</button>
+              <div id="youtubeAuthStatus" style="text-align: center;">
+                <a href="/auth/youtube" class="btn btn-primary" style="display: inline-block; text-decoration: none;">🔑 YouTube 인증</a>
+              </div>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- 실시간 통계 -->
+      <div class="admin-card">
+        <div class="admin-card-header">
+          <h3>📊 실시간 통계</h3>
+        </div>
+        <div class="admin-card-body">
+          <div class="stat-grid">
+            <div class="stat-item">
+              <div class="stat-value" id="totalPets">0</div>
+              <div class="stat-label">총 펫</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value" id="totalViewers">0</div>
+              <div class="stat-label">시청자</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value" id="totalSubscribers">0</div>
+              <div class="stat-label">구독자</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value" id="totalSuperchats">0</div>
+              <div class="stat-label">슈퍼챗</div>
+            </div>
+          </div>
+          <div style="margin-top: 15px; text-align: center;">
+            <span class="status-badge" id="connectionStatus">연결 확인 중...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 게임 설정 -->
+      <div class="admin-card">
+        <div class="admin-card-header">
+          <h3>⚙️ 게임 설정</h3>
+        </div>
+        <div class="admin-card-body">
+          <div class="setting-group">
+            <label>펫 타임아웃 (분)</label>
+            <input type="number" id="petTimeout" value="5" min="1" max="60">
+          </div>
+          <div class="setting-group">
+            <label>배고픔 감소 속도 (1~10)</label>
+            <input type="range" id="hungerSpeed" min="1" max="10" value="5">
+            <span id="hungerSpeedValue">5</span>
+          </div>
+          <div class="setting-group">
+            <label>경험치 배율 (1~5)</label>
+            <input type="range" id="expMultiplier" min="1" max="5" value="1" step="0.5">
+            <span id="expMultiplierValue">1x</span>
+          </div>
+          <button class="btn btn-primary" onclick="saveSettings()" style="width: 100%;">💾 설정 저장</button>
+        </div>
+      </div>
+
+      <!-- 펫 관리 -->
+      <div class="admin-card">
+        <div class="admin-card-header">
+          <h3>🐾 펫 관리</h3>
+        </div>
+        <div class="admin-card-body">
+          <div class="pet-list" id="petList">
+            <p style="color: #666; text-align: center;">펫 데이터 로딩 중...</p>
+          </div>
+          <div style="margin-top: 15px; display: flex; gap: 10px;">
+            <button class="btn btn-primary" onclick="refreshPets()" style="flex: 1;">🔄 새로고침</button>
+            <button class="btn btn-danger" onclick="resetAllPets()">🗑️ 전체 초기화</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 진화 설정 -->
+      <div class="admin-card">
+        <div class="admin-card-header">
+          <h3>✨ 진화 경로</h3>
+        </div>
+        <div class="admin-card-body">
+          <p style="color: #666; margin-bottom: 15px;">펫이 Lv.10, Lv.20에 도달하면 자동 진화합니다.</p>
+          <div class="evolution-grid" id="evolutionGrid">
+            <!-- 진화 경로가 여기에 표시됨 -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+
+    // 진화 데이터
+    const evolutions = {
+      '🐣': { lv10: '🐓', lv20: '🦃', name10: '닭', name20: '칠면조' },
+      '🐥': { lv10: '🐔', lv20: '🦚', name10: '암탉', name20: '공작새' },
+      '🐰': { lv10: '🐇', lv20: '🦘', name10: '산토끼', name20: '캥거루' },
+      '🐹': { lv10: '🐿️', lv20: '🦫', name10: '다람쥐', name20: '비버' },
+      '🐱': { lv10: '🦁', lv20: '🐯', name10: '사자', name20: '호랑이' },
+      '🐶': { lv10: '🦊', lv20: '🐺', name10: '여우', name20: '늑대' },
+      '🐼': { lv10: '🐻', lv20: '🐻‍❄️', name10: '곰', name20: '북극곰' },
+      '🦄': { lv10: '🐲', lv20: '🐉', name10: '용', name20: '신룡' }
+    };
+
+    // 초기화
+    socket.on('connect', () => {
+      document.getElementById('connectionStatus').textContent = '✅ 연결됨';
+      document.getElementById('connectionStatus').className = 'status-badge status-connected';
+      requestStats();
+    });
+
+    socket.on('disconnect', () => {
+      document.getElementById('connectionStatus').textContent = '❌ 연결 끊김';
+      document.getElementById('connectionStatus').className = 'status-badge status-disconnected';
+    });
+
+    // 통계 요청
+    function requestStats() {
+      socket.emit('admin-request-stats');
+    }
+
+    // 통계 수신
+    socket.on('admin-stats', (data) => {
+      document.getElementById('totalPets').textContent = data.totalPets || 0;
+      document.getElementById('totalViewers').textContent = data.viewers || 0;
+      document.getElementById('totalSubscribers').textContent = data.subscribers || 0;
+      document.getElementById('totalSuperchats').textContent = data.superchats || 0;
+
+      // 펫 목록 업데이트
+      updatePetList(data.pets || []);
+    });
+
+    function updatePetList(pets) {
+      const list = document.getElementById('petList');
+
+      // 기본 펫 제외
+      const userPets = pets.filter(p => !p.isDefault);
+
+      if (userPets.length === 0) {
+        list.innerHTML = '<p style="color: #666; text-align: center;">아직 시청자 펫이 없습니다.<br><small>테스트 페이지에서 구독/슈퍼챗을 시뮬레이션하세요.</small></p>';
+        return;
+      }
+
+      // 점수순 정렬
+      userPets.sort((a, b) => (b.totalScore || 0) - (a.totalScore || 0));
+
+      const rarityColors = {
+        common: '#888',
+        rare: '#4CAF50',
+        epic: '#2196F3',
+        legendary: '#9C27B0',
+        mythic: '#FF9800'
+      };
+
+      list.innerHTML = userPets.map(pet => `
+        <div class="pet-item" style="border-left: 4px solid ${rarityColors[pet.rarity] || '#888'}">
+          <div class="pet-emoji">${pet.emoji}</div>
+          <div class="pet-info">
+            <div class="pet-name">${pet.name} <small style="color:#888">(${pet.createdBy})</small></div>
+            <div class="pet-stats">
+              Lv.${pet.level} | ${pet.rarity} | ${(pet.totalScore || 0).toLocaleString()}점
+              <br>
+              <small>행복 ${pet.happiness || 0}% | 배고픔 ${pet.hunger || 0}%</small>
+            </div>
+          </div>
+          <div class="pet-actions">
+            <button class="btn btn-primary" onclick="feedPet('${pet.id}')" title="먹이주기">🍖</button>
+            <button class="btn btn-danger" onclick="removePet('${pet.id}')" title="제거">✕</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // 진화 경로 표시
+    function renderEvolutions() {
+      const grid = document.getElementById('evolutionGrid');
+      grid.innerHTML = Object.entries(evolutions).map(([base, evo]) => `
+        <div class="evolution-card">
+          <div class="evolution-stage">
+            <div class="evolution-emoji">${base}</div>
+            <div class="evolution-level">기본</div>
+          </div>
+          <div class="evolution-arrow">→</div>
+          <div class="evolution-stage">
+            <div class="evolution-emoji">${evo.lv10}</div>
+            <div class="evolution-level">Lv.10</div>
+          </div>
+          <div class="evolution-arrow">→</div>
+          <div class="evolution-stage">
+            <div class="evolution-emoji">${evo.lv20}</div>
+            <div class="evolution-level">Lv.20</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // 슬라이더 값 표시
+    document.getElementById('hungerSpeed').addEventListener('input', (e) => {
+      document.getElementById('hungerSpeedValue').textContent = e.target.value;
+    });
+
+    document.getElementById('expMultiplier').addEventListener('input', (e) => {
+      document.getElementById('expMultiplierValue').textContent = e.target.value + 'x';
+    });
+
+    // 설정 저장
+    function saveSettings() {
+      const settings = {
+        petTimeout: document.getElementById('petTimeout').value,
+        hungerSpeed: document.getElementById('hungerSpeed').value,
+        expMultiplier: document.getElementById('expMultiplier').value
+      };
+      socket.emit('admin-save-settings', settings);
+      alert('설정이 저장되었습니다!');
+    }
+
+    // 펫 새로고침
+    function refreshPets() {
+      requestStats();
+    }
+
+    // 펫 먹이주기
+    function feedPet(petId) {
+      socket.emit('admin-feed-pet', { petId });
+      // 즉시 새로고침
+      setTimeout(refreshPets, 300);
+    }
+
+    // 펫 제거
+    function removePet(petId) {
+      if (confirm('이 펫을 제거하시겠습니까?')) {
+        socket.emit('admin-remove-pet', { petId });
+        setTimeout(refreshPets, 500);
+      }
+    }
+
+    // 전체 초기화
+    function resetAllPets() {
+      if (confirm('정말로 모든 펫을 초기화하시겠습니까?\n(기본 펫 제외)')) {
+        socket.emit('admin-reset-pets');
+        setTimeout(refreshPets, 500);
+      }
+    }
+
+    // 초기 렌더링
+    renderEvolutions();
+
+    // 2초마다 자동 새로고침
+    setInterval(requestStats, 2000);
+
+    // YouTube 연결 상태 수신
+    socket.on('youtube-status', (data) => {
+      updateYouTubeStatus(data);
+    });
+
+    socket.on('youtube-live-status', (data) => {
+      if (data.success) {
+        document.getElementById('youtubeStatus').innerHTML =
+          '<span class="status-badge status-connected">✅ ' + data.message + '</span>';
+      } else {
+        document.getElementById('youtubeStatus').innerHTML =
+          '<span class="status-badge status-disconnected">❌ ' + data.message + '</span>';
+      }
+    });
+
+    function updateYouTubeStatus(data) {
+      const statusDiv = document.getElementById('youtubeStatus');
+      const authDiv = document.getElementById('youtubeAuthStatus');
+
+      // 라이브 활성 상태 업데이트
+      if (data.liveActive) {
+        statusDiv.innerHTML = '<span class="status-badge status-connected">🔴 라이브 연결됨</span>';
+      } else {
+        statusDiv.innerHTML = '<span class="status-badge status-disconnected">라이브 미연결</span>';
+      }
+
+      // API 인증 상태 (기존 API 방식용)
+      if (data.authenticated) {
+        authDiv.innerHTML = '<span style="color: green;">✅ YouTube API 인증됨</span>';
+      } else {
+        authDiv.innerHTML = '<a href="/auth/youtube" class="btn btn-primary" style="display: inline-block; text-decoration: none;">🔑 YouTube 인증</a>';
+      }
+    }
+
+    function connectYouTube() {
+      const videoId = document.getElementById('videoId').value.trim();
+      if (!videoId) {
+        alert('YouTube 영상 ID를 입력하세요.');
+        return;
+      }
+      document.getElementById('youtubeStatus').innerHTML =
+        '<span class="status-badge" style="background:#fff3cd;color:#856404;">연결 중...</span>';
+      socket.emit('start-youtube-live', { videoId: videoId });
+    }
+
+    // 무료 연결 (API 할당량 없음)
+    function connectYouTubeFree() {
+      const videoId = document.getElementById('videoId').value.trim();
+      if (!videoId) {
+        alert('YouTube 영상 ID를 입력하세요.');
+        return;
+      }
+      document.getElementById('youtubeStatus').innerHTML =
+        '<span class="status-badge" style="background:#fff3cd;color:#856404;">🆓 무료 연결 중...</span>';
+      socket.emit('start-youtube-free', { videoId: videoId });
+    }
+
+    function disconnectYouTube() {
+      socket.emit('stop-youtube-live');
+      document.getElementById('youtubeStatus').innerHTML =
+        '<span class="status-badge status-disconnected">연결 해제됨</span>';
+    }
+  </script>
+</body>
+</html>

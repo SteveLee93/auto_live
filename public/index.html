@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🐾 힐링 펫 팜 - Healing Pet Farm</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    /* 힐링 펫 팜 - 게임 HUD 오버레이 */
+
+    /* OBS 스트리밍용 전체화면 */
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      height: 100vh;
+    }
+    .main-container {
+      max-width: 100%;
+      padding: 0;
+      height: 100vh;
+    }
+    .farm-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      margin: 0;
+      max-width: none;
+    }
+    .farm {
+      height: 100vh !important;
+      border-radius: 0 !important;
+    }
+    header {
+      display: none !important;
+    }
+
+    /* 좌측 상단 - 통계 + 랭킹 */
+    .live-panel {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 45%;
+    }
+
+    .live-panel-header {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(0,0,0,0.75);
+      padding: 8px 16px;
+      border-radius: 16px;
+      width: fit-content;
+    }
+
+    .live-panel-header .pulse {
+      width: 12px;
+      height: 12px;
+      background: #ff4757;
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    .live-panel-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    /* 통계 */
+    .live-stats-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      background: rgba(0,0,0,0.75);
+      padding: 8px;
+      border-radius: 16px;
+      max-width: 100%;
+    }
+
+    .live-stat {
+      padding: 6px 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 12px;
+    }
+
+    .live-stat:hover { background: rgba(255,255,255,0.1); }
+
+    .live-stat-value {
+      font-size: 20px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .live-stat-label {
+      font-size: 18px;
+    }
+
+    .live-stat-text {
+      font-size: 12px;
+      color: rgba(255,255,255,0.7);
+      font-weight: 500;
+    }
+
+    .live-panel-body { display: none; }
+
+    /* 랭킹 - 세로 리스트 */
+    .live-ranking-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      background: rgba(0,0,0,0.75);
+      padding: 12px;
+      border-radius: 16px;
+      min-width: 200px;
+      max-width: 100%;
+    }
+
+    .live-section-title { display: none; }
+
+    .live-rank-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 12px;
+    }
+
+    .live-rank-item:hover { background: rgba(255,255,255,0.1); }
+
+    .live-rank-position {
+      font-size: 18px;
+      font-weight: 800;
+      min-width: 24px;
+      text-align: center;
+    }
+
+    .live-rank-position.gold { color: #FFD700; }
+    .live-rank-position.silver { color: #C0C0C0; }
+    .live-rank-position.bronze { color: #CD7F32; }
+
+    .live-rank-emoji { font-size: 26px; line-height: 1; }
+
+    .live-rank-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .live-rank-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .live-rank-owner {
+      font-size: 12px;
+      color: rgba(255,255,255,0.7);
+    }
+
+    .live-rank-stats { display: none; }
+
+    .live-rank-score {
+      font-size: 14px;
+      font-weight: 700;
+      color: #FFD700;
+    }
+
+    /* 채팅 로그 */
+    .live-events {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      background: rgba(0,0,0,0.75);
+      padding: 10px;
+      border-radius: 16px;
+      max-height: 120px;
+      overflow-y: auto;
+      min-width: 180px;
+      max-width: 100%;
+    }
+
+    .live-events::-webkit-scrollbar { width: 4px; }
+    .live-events::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 4px; }
+
+    .live-event-item {
+      font-size: 13px;
+      color: rgba(255,255,255,0.9);
+      padding: 5px 10px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.05);
+    }
+
+    .live-event-item.subscribe { color: #34D399; }
+    .live-event-item.superchat { color: #FBBF24; }
+
+    .live-empty {
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
+      padding: 8px 12px;
+      text-align: center;
+    }
+
+    /* 우측 상단 - 정보 패널 */
+    .right-panel {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 45%;
+    }
+
+    .right-panel-box {
+      background: rgba(0,0,0,0.75);
+      padding: 12px 16px;
+      border-radius: 16px;
+      max-width: 100%;
+    }
+
+    .right-panel-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+
+    /* 확률 리스트 */
+    .probability-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .prob-item {
+      font-size: 18px;
+      font-weight: 600;
+      color: #fff;
+      padding: 4px 10px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 8px;
+    }
+
+    .rarity-common { color: #D1D5DB; font-weight: 700; }
+    .rarity-rare { color: #4ADE80; font-weight: 700; }
+    .rarity-epic { color: #60A5FA; font-weight: 700; }
+    .rarity-legendary { color: #C084FC; font-weight: 700; }
+    .rarity-mythic { color: #FBBF24; font-weight: 700; }
+
+    /* 명령어 그리드 */
+    .cmd-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .cmd-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .cmd-icon {
+      font-size: 24px;
+      min-width: 30px;
+    }
+
+    .cmd-text {
+      font-size: 16px;
+      color: rgba(255,255,255,0.9);
+      font-weight: 500;
+    }
+
+    /* 진화 정보 숨김 */
+    .evolution-guide {
+      display: none;
+    }
+
+    .evolution-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .evo-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .evo-level {
+      font-size: 14px;
+      font-weight: 700;
+      color: #A78BFA;
+      min-width: 45px;
+    }
+
+    .evo-desc {
+      font-size: 13px;
+      color: rgba(255,255,255,0.9);
+    }
+
+    .evo-tip {
+      font-size: 12px;
+      color: #FBBF24;
+      margin-top: 4px;
+    }
+
+    .status-bar { display: none; }
+
+    /* 헤더 네비게이션 */
+    .header-nav {
+      display: flex;
+      gap: 6px;
+      margin-right: 10px;
+    }
+
+    .header-nav a {
+      padding: 6px 12px;
+      background: rgba(0,0,0,0.4);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .header-nav a:hover { background: rgba(0,0,0,0.6); }
+
+    /* 반응형 */
+    @media (max-width: 900px) {
+      .right-panel { top: 10px; right: 10px; }
+      .right-panel-box { padding: 10px 12px; }
+      .right-panel-title { font-size: 16px; }
+      .prob-item { font-size: 14px; }
+      .cmd-icon { font-size: 20px; }
+      .cmd-text { font-size: 14px; }
+    }
+
+    @media (max-width: 640px) {
+      .live-panel { top: 6px; left: 6px; }
+      .live-stats-row { flex-wrap: wrap; }
+      .live-stat-text { display: none; }
+      .live-ranking-list { display: none; }
+      .right-panel { top: 6px; right: 6px; }
+      .right-panel-box { padding: 8px 10px; }
+      .right-panel-title { font-size: 14px; margin-bottom: 6px; }
+      .prob-item { font-size: 12px; padding: 3px 6px; }
+      .cmd-icon { font-size: 18px; }
+      .cmd-text { font-size: 12px; }
+    }
+
+    @media (max-width: 480px) {
+      .right-panel { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <!-- 헤더 -->
+  <header class="header">
+    <div class="header-left">
+      <h1>🐾 힐링 펫 팜</h1>
+    </div>
+    <div class="header-center">
+      <span class="viewers">👥 시청자: <span id="viewerCount">0</span></span>
+      <span class="live-badge">🔴 LIVE</span>
+    </div>
+    <div class="header-right">
+    </div>
+  </header>
+
+  <div class="main-container">
+    <div class="farm-wrapper">
+      <!-- 농장 -->
+      <div id="farm" class="farm">
+        <!-- 하늘 -->
+        <div class="sky">
+          <div class="cloud" style="left: 10%; top: 10%;">☁️</div>
+          <div class="cloud" style="left: 60%; top: 15%;">☁️</div>
+          <div class="cloud" style="left: 85%; top: 8%;">☁️</div>
+          <div class="sun">☀️</div>
+        </div>
+
+        <!-- 배경 장식 -->
+        <div class="decoration tree" style="left: 5%; top: 20%;">🌳</div>
+        <div class="decoration tree" style="left: 90%; top: 20%;">🌳</div>
+        <div class="decoration flower" style="left: 15%; top: 35%;">🌸</div>
+        <div class="decoration flower" style="left: 25%; top: 38%;">🌷</div>
+        <div class="decoration flower" style="left: 70%; top: 36%;">🌻</div>
+        <div class="decoration flower" style="left: 80%; top: 39%;">🌺</div>
+
+        <!-- 고급 효과 레이어 -->
+        <div class="vignette"></div>
+        <div class="soft-light-overlay"></div>
+        <div class="aurora-effect"></div>
+        <div class="wave-effect"></div>
+
+        <!-- 펫 및 먹이가 렌더링될 영역 -->
+        <div id="petsContainer"></div>
+        <div id="foodsContainer"></div>
+        <div id="effectsContainer"></div>
+        <div id="environmentContainer"></div>
+
+        <!-- 연못 -->
+        <div class="pond">
+          <span class="water-drop" style="left: 10%;">💧</span>
+          <span class="water-drop" style="left: 80%;">💧</span>
+        </div>
+
+        <!-- 잔디 -->
+        <div class="grass">
+          🌱 🌿 🌾 🌱 🌿 🌾 🌱 🌿 🌾 🌱 🌿 🌾 🌱 🌿 🌾 🌱 🌿 🌾
+        </div>
+
+        <!-- 실시간 현황 (좌측 상단) -->
+        <div class="live-panel">
+          <div class="live-panel-header">
+            <span class="pulse"></span>
+            <span class="live-panel-title">LIVE</span>
+          </div>
+
+          <!-- 통계 -->
+          <div class="live-stats-row">
+            <div class="live-stat" title="현재 농장의 펫 수">
+              <span class="live-stat-label">🐾</span>
+              <span class="live-stat-value" id="livePetCount">0</span>
+              <span class="live-stat-text">마리</span>
+            </div>
+            <div class="live-stat" title="총 구독자 수">
+              <span class="live-stat-label">⭐</span>
+              <span class="live-stat-value" id="liveSubscribers">0</span>
+              <span class="live-stat-text">구독</span>
+            </div>
+            <div class="live-stat" title="총 후원 횟수">
+              <span class="live-stat-label">💰</span>
+              <span class="live-stat-value" id="liveSuperchats">0</span>
+              <span class="live-stat-text">후원</span>
+            </div>
+            <div class="live-stat" title="펫 평균 레벨">
+              <span class="live-stat-label">📊</span>
+              <span class="live-stat-value" id="liveAvgLevel">-</span>
+              <span class="live-stat-text">평균Lv</span>
+            </div>
+          </div>
+
+          <!-- 랭킹 TOP 3 -->
+          <div class="live-ranking-list" id="liveRankingList">
+            <div class="live-empty">🏆 펫 랭킹 대기중...</div>
+          </div>
+
+          <!-- 채팅 로그 -->
+          <div class="live-events" id="liveEvents">
+            <div class="live-event-item">💬 채팅으로 펫과 교감하세요!</div>
+          </div>
+        </div>
+
+        <!-- 우측 상단 정보 패널 -->
+        <div class="right-panel">
+          <!-- 펫 등급 확률 -->
+          <div class="right-panel-box">
+            <div class="right-panel-title">🎲 등급 확률</div>
+            <div class="probability-list">
+              <span class="prob-item"><span class="rarity-common">일반</span> 41%</span>
+              <span class="prob-item"><span class="rarity-rare">희귀</span> 33%</span>
+              <span class="prob-item"><span class="rarity-epic">에픽</span> 16%</span>
+              <span class="prob-item"><span class="rarity-legendary">전설</span> 8%</span>
+              <span class="prob-item"><span class="rarity-mythic">신화</span> 2%</span>
+            </div>
+          </div>
+
+          <!-- 채팅 명령어 -->
+          <div class="right-panel-box">
+            <div class="right-panel-title">💬 채팅 명령어</div>
+            <div class="cmd-grid">
+              <div class="cmd-row"><span class="cmd-icon">🐣</span><span class="cmd-text">시작, 제거</span></div>
+              <div class="cmd-row"><span class="cmd-icon">🍽️</span><span class="cmd-text">밥, 고기, 케이크, 두쫀쿠</span></div>
+              <div class="cmd-row"><span class="cmd-icon">💕</span><span class="cmd-text">쓰다듬, 점프, 춤, 뽀뽀</span></div>
+              <div class="cmd-row"><span class="cmd-icon">🌦️</span><span class="cmd-text">비, 눈, 밤, 무지개</span></div>
+              <div class="cmd-row"><span class="cmd-icon">🎉</span><span class="cmd-text">파티, 불꽃, 선물</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 하단 상태바 (숨김 - CSS로 display:none) -->
+      <div class="status-bar">
+        <span id="petCount">0</span>
+        <span id="avgLevel">0</span>
+        <span id="happiness">0</span>
+        <span id="topScore">-</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Socket.IO 클라이언트 -->
+  <script src="/socket.io/socket.io.js"></script>
+  <!-- 게임 로직 -->
+  <script src="/js/game.js?v=14"></script>
+  <script>
+    // XSS 방지 헬퍼
+    function escapeHtml(str) {
+      if (!str) return '';
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function toggleSettings() {
+      showSettings();
+    }
+
+    function toggleBGMFromHeader() {
+      const isPlaying = window.bgmSystem.toggle();
+      const btn = document.getElementById('musicToggleBtn');
+      btn.textContent = isPlaying ? '🎵' : '🔇';
+      btn.title = isPlaying ? '배경음악 끄기' : '배경음악 켜기';
+    }
+
+    // BGM 토글
+    function toggleBGM() {
+      const isPlaying = window.bgmSystem.toggle();
+      const btn = document.getElementById('bgmBtn');
+      btn.classList.toggle('active', isPlaying);
+      btn.classList.toggle('muted', !isPlaying);
+      btn.textContent = isPlaying ? '🎵' : '🎵';
+      btn.title = isPlaying ? '배경음악 끄기' : '배경음악 켜기';
+    }
+
+    // 효과음 토글
+    function toggleSFX() {
+      const settings = window.gameState.settings;
+      settings.soundEnabled = !settings.soundEnabled;
+      const btn = document.getElementById('sfxBtn');
+      btn.classList.toggle('active', settings.soundEnabled);
+      btn.classList.toggle('muted', !settings.soundEnabled);
+      btn.textContent = settings.soundEnabled ? '🔊' : '🔇';
+      btn.title = settings.soundEnabled ? '효과음 끄기' : '효과음 켜기';
+
+      // 효과음 테스트
+      if (settings.soundEnabled && window.soundSystem) {
+        window.soundSystem.play('click');
+      }
+    }
+
+    // 페이지 로드 시 사운드 버튼 초기화
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(() => {
+        const sfxBtn = document.getElementById('sfxBtn');
+        if (sfxBtn && window.gameState?.settings?.soundEnabled) {
+          sfxBtn.classList.add('active');
+        }
+      }, 500);
+    });
+
+    // 실시간 상황 업데이트
+    function updateLiveStatus() {
+      const pets = window.gameState?.pets || [];
+      const stats = window.gameState?.stats || {};
+
+      document.getElementById('livePetCount').textContent = pets.length;
+      document.getElementById('liveSubscribers').textContent = stats.totalSubscribers || 0;
+      document.getElementById('liveSuperchats').textContent = stats.totalSuperchats || 0;
+
+      // 평균 레벨 계산
+      if (pets.length > 0) {
+        const avgLv = Math.round(pets.reduce((sum, p) => sum + p.level, 0) / pets.length);
+        document.getElementById('liveAvgLevel').textContent = avgLv;
+      }
+
+      // 랭킹 업데이트
+      updateLiveRanking(pets);
+    }
+
+    // 랭킹 업데이트 (TOP 3만)
+    function updateLiveRanking(pets) {
+      const container = document.getElementById('liveRankingList');
+      if (!container) return;
+
+      // 점수순 정렬 후 상위 3개만
+      const sorted = [...pets]
+        .filter(p => !p.isDefault)
+        .sort((a, b) => (b.totalScore || 0) - (a.totalScore || 0))
+        .slice(0, 3);
+
+      if (sorted.length === 0) {
+        container.innerHTML = '<div class="live-empty">펫 대기중...</div>';
+        return;
+      }
+
+      const positionClass = ['gold', 'silver', 'bronze'];
+
+      container.innerHTML = sorted.map((pet, i) => `
+        <div class="live-rank-item">
+          <div class="live-rank-position ${positionClass[i]}">${i + 1}</div>
+          <div class="live-rank-emoji">${pet.emoji}</div>
+          <div class="live-rank-info">
+            <div class="live-rank-name">${escapeHtml(pet.createdBy || '???')}</div>
+            <div class="live-rank-owner">${escapeHtml(pet.name)}</div>
+          </div>
+          <div class="live-rank-score">${(pet.totalScore || 0).toLocaleString()}</div>
+        </div>
+      `).join('');
+    }
+
+    // 실시간 이벤트 추가
+    const MAX_EVENTS = 8;
+    function addLiveEvent(message, type = '') {
+      const container = document.getElementById('liveEvents');
+      if (!container) return;
+
+      const item = document.createElement('div');
+      item.className = 'live-event-item' + (type ? ' ' + type : '');
+      item.textContent = message;
+
+      container.appendChild(item);
+      container.scrollTop = container.scrollHeight;
+
+      // 최대 개수 초과 시 오래된 항목 제거
+      while (container.children.length > MAX_EVENTS) {
+        container.removeChild(container.firstChild);
+      }
+    }
+
+    // 소켓 이벤트 수신
+    if (window.socket) {
+      socket.on('new-subscribe', (data) => {
+        addLiveEvent(`${data.username}님이 구독!`, 'subscribe');
+        updateLiveStatus();
+      });
+
+      socket.on('new-superchat', (data) => {
+        addLiveEvent(`${data.username}님 ₩${data.amount.toLocaleString()} 후원!`, 'superchat');
+        updateLiveStatus();
+      });
+
+      socket.on('viewer-join', (data) => {
+        addLiveEvent(`👋 ${data.username}님 입장`);
+      });
+
+      socket.on('new-chat', (data) => {
+        addLiveEvent(`💬 ${data.username}: ${data.message}`);
+      });
+    }
+
+    // 주기적 업데이트
+    setInterval(updateLiveStatus, 1000);
+  </script>
+</body>
+</html>

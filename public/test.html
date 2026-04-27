@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎮 테스트 시뮬레이션 - 힐링 펫 팜</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    body {
+      background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .test-container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .test-header {
+      background: white;
+      border-radius: 16px;
+      padding: 20px 30px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+
+    .test-header h1 {
+      font-size: 28px;
+      background: linear-gradient(135deg, #11998e, #38ef7d);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .test-nav {
+      display: flex;
+      gap: 10px;
+    }
+
+    .test-nav a {
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #11998e, #38ef7d);
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .test-nav a:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(17, 153, 142, 0.4);
+    }
+
+    .test-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .test-card {
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+
+    .test-card-header {
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+      padding: 15px 20px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .test-card-header h3 {
+      font-size: 18px;
+      color: #333;
+    }
+
+    .test-card-body {
+      padding: 20px;
+    }
+
+    .input-group {
+      margin-bottom: 15px;
+    }
+
+    .input-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #333;
+      font-size: 14px;
+    }
+
+    .input-group input,
+    .input-group select {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #eee;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.2s;
+    }
+
+    .input-group input:focus,
+    .input-group select:focus {
+      outline: none;
+      border-color: #11998e;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      width: 100%;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #11998e, #38ef7d);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(17, 153, 142, 0.4);
+    }
+
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 15px;
+    }
+
+    .quick-btn {
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      font-size: 12px;
+      cursor: pointer;
+      background: #f0f0f0;
+      transition: all 0.2s;
+    }
+
+    .quick-btn:hover {
+      background: #e0e0e0;
+      transform: scale(1.05);
+    }
+
+    .quick-btn.food { background: #fff3e0; }
+    .quick-btn.action { background: #e3f2fd; }
+    .quick-btn.weather { background: #e8f5e9; }
+    .quick-btn.event { background: #fce4ec; }
+
+    .log-area {
+      background: #1a1a2e;
+      border-radius: 8px;
+      padding: 15px;
+      height: 300px;
+      overflow-y: auto;
+      font-family: 'Consolas', monospace;
+      font-size: 13px;
+    }
+
+    .log-item {
+      padding: 4px 0;
+      border-bottom: 1px solid #2a2a4e;
+      color: #eee;
+    }
+
+    .log-item.success { color: #4ade80; }
+    .log-item.info { color: #60a5fa; }
+    .log-item.warning { color: #fbbf24; }
+
+    .status-bar {
+      background: white;
+      border-radius: 12px;
+      padding: 15px 20px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+
+    .status-item {
+      text-align: center;
+    }
+
+    .status-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: #11998e;
+    }
+
+    .status-label {
+      font-size: 12px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="test-container">
+    <header class="test-header">
+      <h1>🎮 테스트 시뮬레이션</h1>
+      <nav class="test-nav">
+        <a href="/">🏠 메인</a>
+        <a href="/admin">👑 관리자</a>
+      </nav>
+    </header>
+
+    <div class="status-bar">
+      <div class="status-item">
+        <div class="status-value" id="petCount">0</div>
+        <div class="status-label">펫</div>
+      </div>
+      <div class="status-item">
+        <div class="status-value" id="viewerCount">0</div>
+        <div class="status-label">시청자</div>
+      </div>
+      <div class="status-item">
+        <div class="status-value" id="subCount">0</div>
+        <div class="status-label">구독</div>
+      </div>
+      <div class="status-item">
+        <div class="status-value" id="scCount">0</div>
+        <div class="status-label">슈퍼챗</div>
+      </div>
+    </div>
+
+    <div class="test-content">
+      <!-- 시청자 입장 -->
+      <div class="test-card">
+        <div class="test-card-header">
+          <h3>👋 시청자 입장</h3>
+        </div>
+        <div class="test-card-body">
+          <div class="input-group">
+            <label>닉네임</label>
+            <input type="text" id="joinUsername" placeholder="시청자 닉네임" value="새시청자">
+          </div>
+          <button class="btn btn-primary" onclick="simulateViewerJoin()">👋 입장 시뮬레이션</button>
+        </div>
+      </div>
+
+      <!-- 구독 -->
+      <div class="test-card">
+        <div class="test-card-header">
+          <h3>⭐ 구독</h3>
+        </div>
+        <div class="test-card-body">
+          <div class="input-group">
+            <label>닉네임</label>
+            <input type="text" id="subUsername" placeholder="구독자 닉네임" value="테스터">
+          </div>
+          <button class="btn btn-primary" onclick="simulateSubscribe()">⭐ 구독 시뮬레이션</button>
+        </div>
+      </div>
+
+      <!-- 슈퍼챗 -->
+      <div class="test-card">
+        <div class="test-card-header">
+          <h3>💰 슈퍼챗</h3>
+        </div>
+        <div class="test-card-body">
+          <div class="input-group">
+            <label>닉네임</label>
+            <input type="text" id="scUsername" placeholder="후원자 닉네임" value="후원자">
+          </div>
+          <div class="input-group">
+            <label>금액</label>
+            <select id="scAmount">
+              <option value="500">500원 (일반)</option>
+              <option value="2000">2,000원 (희귀)</option>
+              <option value="5000">5,000원 (에픽)</option>
+              <option value="10000">10,000원 (전설)</option>
+              <option value="50000">50,000원 (신화)</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" onclick="simulateSuperchat()">💰 슈퍼챗 시뮬레이션</button>
+        </div>
+      </div>
+
+      <!-- 채팅 -->
+      <div class="test-card">
+        <div class="test-card-header">
+          <h3>💬 채팅</h3>
+        </div>
+        <div class="test-card-body">
+          <div class="input-group">
+            <label>닉네임</label>
+            <input type="text" id="chatUsername" placeholder="채팅 닉네임" value="시청자">
+          </div>
+          <div class="input-group">
+            <label>메시지</label>
+            <input type="text" id="chatMessage" placeholder="채팅 메시지" value="밥">
+          </div>
+          <button class="btn btn-primary" onclick="simulateChat()">💬 채팅 시뮬레이션</button>
+
+          <div class="quick-actions">
+            <button class="quick-btn food" onclick="quickChat('밥')">🥕 밥</button>
+            <button class="quick-btn food" onclick="quickChat('간식')">🍪 간식</button>
+            <button class="quick-btn food" onclick="quickChat('고기')">🍖 고기</button>
+            <button class="quick-btn food" onclick="quickChat('케이크')">🍰 케이크</button>
+            <button class="quick-btn action" onclick="quickChat('쓰다듬')">💝 쓰다듬</button>
+            <button class="quick-btn action" onclick="quickChat('점프')">🦘 점프</button>
+            <button class="quick-btn action" onclick="quickChat('춤')">💃 춤</button>
+            <button class="quick-btn action" onclick="quickChat('잠')">😴 잠</button>
+            <button class="quick-btn weather" onclick="quickChat('비')">🌧️ 비</button>
+            <button class="quick-btn weather" onclick="quickChat('눈')">❄️ 눈</button>
+            <button class="quick-btn weather" onclick="quickChat('밤')">🌙 밤</button>
+            <button class="quick-btn weather" onclick="quickChat('맑음')">☀️ 맑음</button>
+            <button class="quick-btn event" onclick="quickChat('파티')">🎉 파티</button>
+            <button class="quick-btn event" onclick="quickChat('불꽃')">🎆 불꽃</button>
+            <button class="quick-btn event" onclick="quickChat('꽃')">🌸 꽃</button>
+            <button class="quick-btn event" onclick="quickChat('선물')">🎁 선물</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 로그 -->
+      <div class="test-card" style="grid-column: span 2;">
+        <div class="test-card-header">
+          <h3>📋 실시간 로그</h3>
+        </div>
+        <div class="test-card-body">
+          <div class="log-area" id="logArea">
+            <div class="log-item info">🎮 테스트 시뮬레이션 페이지 로드됨</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+
+    // 연결 상태
+    socket.on('connect', () => {
+      addLog('✅ 서버에 연결되었습니다', 'success');
+      requestStats();
+    });
+
+    socket.on('disconnect', () => {
+      addLog('❌ 서버 연결이 끊어졌습니다', 'warning');
+    });
+
+    // 통계 요청
+    function requestStats() {
+      socket.emit('admin-request-stats');
+    }
+
+    // 통계 수신
+    socket.on('admin-stats', (data) => {
+      document.getElementById('petCount').textContent = data.totalPets || 0;
+      document.getElementById('viewerCount').textContent = data.viewers || 0;
+      document.getElementById('subCount').textContent = data.subscribers || 0;
+      document.getElementById('scCount').textContent = data.superchats || 0;
+    });
+
+    // 로그 추가
+    function addLog(message, type = 'info') {
+      const logArea = document.getElementById('logArea');
+      const time = new Date().toLocaleTimeString();
+      const logItem = document.createElement('div');
+      logItem.className = `log-item ${type}`;
+      logItem.textContent = `[${time}] ${message}`;
+      logArea.appendChild(logItem);
+      logArea.scrollTop = logArea.scrollHeight;
+    }
+
+    // 시뮬레이션 함수들
+    function simulateViewerJoin() {
+      const username = document.getElementById('joinUsername').value || '새시청자';
+      socket.emit('simulate-viewer-join', { username });
+      addLog(`👋 ${username}님 입장 시뮬레이션`, 'info');
+    }
+
+    function simulateSubscribe() {
+      const username = document.getElementById('subUsername').value || '테스터';
+      socket.emit('simulate-subscribe', { username });
+      addLog(`⭐ ${username}님 구독 시뮬레이션`, 'success');
+    }
+
+    function simulateSuperchat() {
+      const username = document.getElementById('scUsername').value || '후원자';
+      const amount = parseInt(document.getElementById('scAmount').value);
+      socket.emit('simulate-superchat', { username, amount });
+      addLog(`💰 ${username}님 ${amount.toLocaleString()}원 슈퍼챗 시뮬레이션`, 'success');
+    }
+
+    function simulateChat() {
+      const username = document.getElementById('chatUsername').value || '시청자';
+      const message = document.getElementById('chatMessage').value || '밥';
+      socket.emit('simulate-chat', { username, message });
+      addLog(`💬 ${username}: ${message}`, 'info');
+    }
+
+    function quickChat(message) {
+      document.getElementById('chatMessage').value = message;
+      simulateChat();
+    }
+
+    // 서버 이벤트 수신
+    socket.on('new-subscribe', (data) => {
+      addLog(`🎉 ${data.username}님이 구독했습니다!`, 'success');
+      requestStats();
+    });
+
+    socket.on('new-superchat', (data) => {
+      addLog(`💰 ${data.username}님이 ${data.amount.toLocaleString()}원 후원!`, 'success');
+      requestStats();
+    });
+
+    socket.on('viewer-join', (data) => {
+      addLog(`👋 ${data.username}님이 입장했습니다`, 'info');
+      requestStats();
+    });
+
+    socket.on('chat-message', (data) => {
+      addLog(`💬 ${data.username}: ${data.message}`, 'info');
+    });
+
+    // 주기적 통계 업데이트
+    setInterval(requestStats, 3000);
+  </script>
+</body>
+</html>
